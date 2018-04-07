@@ -21,7 +21,7 @@ export class Signup extends Component {
 		.then((response) => response.json())
 		.then((data) => {
 				if (data === 'success') {
-					this.props.history.push('/some-page');
+					this.props.history.push('/tasks');
 				}
 		});
 	}

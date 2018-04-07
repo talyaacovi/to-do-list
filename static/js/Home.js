@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Form } from './Form';
-import { Test } from './Test';
+import { Task } from './Task';
 import { Link } from 'react-router-dom';
 
 
@@ -23,7 +23,7 @@ export class Home extends Component {
 		.then((response) => response.json())
 		.then((data) => {
 				if (data === 'success') {
-					this.setState({ loggedIn: true });
+					this.props.history.push('/tasks');
 				} else {
 					console.log('wrong password');
 				}
@@ -32,15 +32,11 @@ export class Home extends Component {
 
 	render() {
 		let page;
-		if (this.state.loggedIn) {
-			page = <Test />
-		} else {
-			page =
-				<div>
-					<Form onSubmit={this.handleSubmit.bind(this)} btn='Login'/>
-					<p>Don't have an account? Create one <Link to='/signup'>here</Link></p>
-				</div>
-		}
+		page =
+			<div>
+				<Form onSubmit={this.handleSubmit.bind(this)} btn='Login'/>
+				<p>Don't have an account? Create one <Link to='/signup'>here</Link></p>
+			</div>
 
 		return (
 				<div>

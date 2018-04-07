@@ -7,4 +7,10 @@
 {% endfor %}
 </ul>
 
+<ul>
+{% for movie in discover %}
+	<li>{{ movie['title'] }}, {{ movie['popularity'] }}</li>
+{% endfor %}
+</ul>
+
 {% endblock %}

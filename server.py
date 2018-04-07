@@ -31,7 +31,35 @@ def login():
 
 	return jsonify(msg)
 
-	# check DB if email exists and if password matches
+@app.route('/get-tasks')
+def get_tasks():
+	print 'in get tasks route!'
+	uid = request.args.get('userid')
+	sql = """SELECT description FROM items WHERE user_id = :uid"""
+
+	cursor = db.session.execute(sql, {'uid': uid} )
+	items = cursor.fetchall()
+
+	items = map(lambda x: x[0], items)
+	print items
+
+	return jsonify({'tasks': items})
+
+@app.route('/add-task', methods=['POST'])
+def add_task():
+	task = request.form.get('task')
+	user_id = request.form.get('userid')
+	sql = """INSERT INTO items (description, user_id) VALUES (:description, :user_id)"""
+
+	db.session.execute(sql, {'description': task, 'user_id': user_id} )
+	db.session.commit()
+
+	cursor = db.session.execute("SELECT description FROM items WHERE user_id = :id", {'id': user_id} )
+	items = cursor.fetchall()
+
+	items = map(lambda x: x[0], items)
+
+	return jsonify(items)
 
 @app.route('/signup-user', methods=['POST'])
 def signup():
@@ -51,16 +79,25 @@ def signup():
 def search_movies():
 	term = request.args.get('term')
 	url = 'https://api.themoviedb.org/3/search/movie'
+	disc_url = 'https://api.themoviedb.org/3/discover/movie'
+
 	payload = {
 		'api_key': API_KEY,
 		'query': term
 	}
 
+	disc_payload = {
+		'api_key': API_KEY,
+		'sort_by': 'popularity.desc'
+	}
+
 	r = requests.get(url, params=payload)
 	data = r.json()
-	print data['results']
-	
-	return render_template('movies.html', movies=data['results'])
+
+	disc = requests.get(disc_url, params=disc_payload)
+	disc_data = disc.json()
+
+	return render_template('movies.html', movies=data['results'], discover=disc_data['results'])
 
 
 @app.route('/', defaults={'path': ''})
@@ -81,4 +118,4 @@ def connect_to_db(app, db_uri='postgresql:///todoapp'):
 if __name__ == "__main__":
 	app.debug = True
 	connect_to_db(app)
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', threaded=True)
