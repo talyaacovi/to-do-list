@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Form } from './Form';
 
-export class Login extends Component {
+export class Signup extends Component {
 	constructor(props) {
 		super(props);
 	}
 
 	handleSubmit(email, password) {
 		let payload = new FormData();
-		payload.append('email', email)
-		payload.append('password', password);
 
-		fetch('/login', {
+        payload.append('email', email);
+        payload.append('password', password);
+
+		fetch('/signup-user', {
 			method: 'POST',
 			body: payload,
 			credentials: 'same-origin'
@@ -25,11 +25,7 @@ export class Login extends Component {
 
 	render() {
 		return (
-				<div>
-					<h1>Manage Your Daily Tasks</h1>
-					<Form onSubmit={this.handleSubmit.bind(this)} btn='Login'/>
-					<p>Don't have an account? Create one <Link to='/signup'>here</Link></p>
-				</div>
+				<Form onSubmit={this.handleSubmit.bind(this)} btn='Signup'/>
 			)
 	}
 }
