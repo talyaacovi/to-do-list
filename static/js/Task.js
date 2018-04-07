@@ -5,23 +5,18 @@ export class Task extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { task: '', tasks: [] };
-		console.log('in tasks constructor');
 		this.fetchTasks = this.fetchTasks.bind(this);
 	}
 
 	componentWillMount() {
-		console.log('in tasks component will mount');
 		this.fetchTasks();
 	}
 
 	fetchTasks() {
-		console.log('in fetch tasks');
-		fetch('/get-tasks?userid=' + 9)
+		fetch('/get-tasks?userid=' + this.props.uid)
 		.then((response) => response.json())
 		.then((data) => {
-			// debugger;
 			this.setState({ tasks: data.tasks });
-			console.log(data.tasks);
 		});
 	}
 
@@ -35,7 +30,7 @@ export class Task extends Component {
 
 		let payload = new FormData();
 		payload.append('task', this.state.task);
-		payload.append('userid', 9);
+		payload.append('userid', this.props.uid);
 
 		fetch('/add-task', {
 			method: 'POST',
@@ -49,7 +44,6 @@ export class Task extends Component {
 	}
 	
 	render() {
-		console.log('in tasks render');
 
 		let tasks;
 		tasks = this.state.tasks.map((x,i) => <li key={i}>{x}</li>)

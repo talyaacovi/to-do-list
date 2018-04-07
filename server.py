@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 import os
 import requests
@@ -10,6 +10,7 @@ app = Flask(__name__)
 db = SQLAlchemy()
 
 app.jinja_env.auto_reload = True
+app.secret_key = "ABC123"
 
 
 
@@ -18,18 +19,19 @@ def login():
 	email = request.form.get('email')
 	password = request.form.get('password')
 
-	sql = """SELECT password FROM users WHERE email = :email"""
+	sql = """SELECT password, id FROM users WHERE email = :email"""
 
-	cursor = db.session.execute(sql, {'email': email} )
+	cursor = db.session.execute(sql, {'email': email} ).fetchone()
 
-	db_password = cursor.fetchone()
+	db_password, uid = cursor
 	
-	if db_password[0] == password:
+	if db_password == password:
 		msg = 'success'
+		session['user_id'] = uid
 	else:
 		msg = 'wrong password'
 
-	return jsonify(msg)
+	return jsonify({ 'msg': msg, 'uid': uid })
 
 @app.route('/get-tasks')
 def get_tasks():
