@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form } from './Form';
+import { Redirect } from 'react-router';
 
 export class Signup extends Component {
 	constructor(props) {
@@ -19,13 +20,17 @@ export class Signup extends Component {
 		})
 		.then((response) => response.json())
 		.then((data) => {
-				console.log('success');
+				if (data === 'success') {
+					this.props.history.push('/some-page');
+				}
 		});
 	}
 
 	render() {
 		return (
-				<Form onSubmit={this.handleSubmit.bind(this)} btn='Signup'/>
+				<div>
+					<Form onSubmit={this.handleSubmit.bind(this)} btn='Signup'/>
+				</div>
 			)
 	}
 }

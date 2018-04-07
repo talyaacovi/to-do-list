@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Form } from './Form';
+import { Test } from './Test';
+import { Link } from 'react-router-dom';
 
-export class Login extends Component {
+
+export class Home extends Component {
 	constructor(props) {
 		super(props);
+		this.state = { loggedIn: false };
 	}
 
 	handleSubmit(email, password) {
@@ -19,18 +22,30 @@ export class Login extends Component {
 		})
 		.then((response) => response.json())
 		.then((data) => {
-				if (data.redirect) {
-					window.location.href = data.redirect;
+				if (data === 'success') {
+					this.setState({ loggedIn: true });
+				} else {
+					console.log('wrong password');
 				}
 		});
 	}
 
 	render() {
+		let page;
+		if (this.state.loggedIn) {
+			page = <Test />
+		} else {
+			page =
+				<div>
+					<Form onSubmit={this.handleSubmit.bind(this)} btn='Login'/>
+					<p>Don't have an account? Create one <Link to='/signup'>here</Link></p>
+				</div>
+		}
+
 		return (
 				<div>
 					<h1>Manage Your Daily Tasks</h1>
-					<Form onSubmit={this.handleSubmit.bind(this)} btn='Login'/>
-					<p>Don't have an account? Create one <Link to='/signup'>here</Link></p>
+					{page}
 				</div>
 			)
 	}
