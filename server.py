@@ -1,5 +1,9 @@
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import os
+import requests
+
+API_KEY = os.environ['TMDB_API_KEY']
 
 app = Flask(__name__)
 
@@ -42,6 +46,22 @@ def signup():
 	db.session.commit()
 
 	return jsonify('success');
+
+@app.route('/movie-api')
+def search_movies():
+	term = request.args.get('term')
+	url = 'https://api.themoviedb.org/3/search/movie'
+	payload = {
+		'api_key': API_KEY,
+		'query': term
+	}
+
+	r = requests.get(url, params=payload)
+	data = r.json()
+	print data['results']
+	
+	return render_template('movies.html', movies=data['results'])
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
