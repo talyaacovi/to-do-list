@@ -77,30 +77,39 @@ def signup():
 
 	return jsonify('success');
 
-@app.route('/movie-api')
+@app.route('/search-movie')
 def search_movies():
-	term = request.args.get('term')
+	query = request.args.get('query')
 	url = 'https://api.themoviedb.org/3/search/movie'
-	disc_url = 'https://api.themoviedb.org/3/discover/movie'
 
 	payload = {
 		'api_key': API_KEY,
-		'query': term
+		'query': query
 	}
+
+	r = requests.get(url, params=payload)
+	data = r.json()
+
+	return jsonify(data['results'])
+
+@app.route('/discover-movie')
+def discover_movies():
+	disc_url = 'https://api.themoviedb.org/3/discover/movie'
 
 	disc_payload = {
 		'api_key': API_KEY,
 		'sort_by': 'popularity.desc'
 	}
 
-	r = requests.get(url, params=payload)
+	r = requests.get(disc_url, params=disc_payload)
 	data = r.json()
+	print data['results']
 
-	disc = requests.get(disc_url, params=disc_payload)
-	disc_data = disc.json()
+	return jsonify(data['results'])
 
-	return render_template('movies.html', movies=data['results'], discover=disc_data['results'])
-
+@app.route('/movies')
+def movies():
+	return render_template('movies.html')
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

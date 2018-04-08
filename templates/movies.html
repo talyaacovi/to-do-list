@@ -1,16 +1,76 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<ul>
-{% for movie in movies %}
-	<li>{{ movie['title'] }}</li>
-{% endfor %}
-</ul>
 
-<ul>
-{% for movie in discover %}
-	<li>{{ movie['title'] }}, {{ movie['popularity'] }}</li>
-{% endfor %}
-</ul>
+<div class='row'>
+	<div class='col-xs-6'>
+
+		<form id='search-form'>
+			<label>Search for a movie: 
+				<input id='query' type='text' name='query'/>
+			</label>
+			<input type='submit' value='Search'/>
+		</form>
+
+		<ul id='movie-results'>
+		</ul>
+	</div>
+	<div class='col-xs-6'>
+		<button id='popular-btn'>Discover Popular Movies</button>
+
+		<ul id='popular-results'>
+		</ul>
+
+	</div>
+</div>
+
+<script>
+
+	let form = document.getElementById('search-form');
+	form.addEventListener('submit', searchMovies);
+
+	let btn = document.getElementById('popular-btn');
+	btn.addEventListener('click', discoverMovies);
+
+	function searchMovies(evt) {
+		evt.preventDefault();
+		let query = evt.target.query.value;
+		$.get('/search-movie', {"query": query}, displaySearch);
+	}
+
+	function discoverMovies(evt) {
+		evt.preventDefault();
+		$.get('/discover-movie', displayPopular);
+	}
+
+	function displaySearch(results) {
+		let resultsList = document.getElementById('movie-results');
+		
+		while (resultsList.firstChild) {
+			resultsList.removeChild(resultsList.firstChild);
+		}
+
+		for (let i = 0; i < results.length; i++) {
+			let newMovie = document.createElement("LI");
+			let title = document.createTextNode(results[i]['title']);
+			newMovie.appendChild(title);
+			resultsList.appendChild(newMovie);
+		}
+
+		document.getElementById('query').value = '';
+	}
+
+	function displayPopular(results) {
+		let resultsList = document.getElementById('popular-results');
+
+		for (let i = 0; i < results.length; i++) {
+			let newMovie = document.createElement("LI");
+			let title = document.createTextNode(results[i]['title']);
+			newMovie.appendChild(title);
+			resultsList.appendChild(newMovie);
+		}
+	}
+
+</script>
 
 {% endblock %}
